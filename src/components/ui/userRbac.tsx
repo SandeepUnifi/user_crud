@@ -92,10 +92,23 @@ export function UserRbac() {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const [userToEdit, setUserToEdit] = useState<User | null>(null);
 
   const handleAddUser = (newUser: User) => {
-    setData((prevData) => [...prevData, newUser]);
+    if (userToEdit) {
+      setData((prevData) =>
+        prevData.map((user) => (user.id === newUser.id ? newUser : user))
+      );
+    } else {
+      setData((prevData) => [...prevData, newUser]);
+    }
     setIsAddUserOpen(false);
+    setUserToEdit(null);
+  };
+
+  const handleEditUser = (user: User) => {
+    setUserToEdit(user);
+    setIsAddUserOpen(true);
   };
 
   const handleDeleteUser = (userId: string) => {
@@ -176,9 +189,7 @@ export function UserRbac() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => alert(`Edit Details for ${user.id}`)}
-              >
+              <DropdownMenuItem onClick={() => handleEditUser(user)}>
                 Edit Details
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -274,6 +285,7 @@ export function UserRbac() {
         <AddUser
           onAddUser={handleAddUser}
           onClose={() => setIsAddUserOpen(false)}
+          user={userToEdit}
         />
       )}
       {isConfirmDialogOpen && (
